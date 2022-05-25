@@ -30,10 +30,22 @@ namespace ToDoAPI
 
         public IConfiguration Configuration { get; }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddCors(options =>
+        {
+            options.AddPolicy(name: MyAllowSpecificOrigins,
+                              corsPolicyBuilder =>
+                              {
+                              corsPolicyBuilder
+                              .AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                              });
+        });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -81,6 +93,8 @@ namespace ToDoAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDoAPI v1"));
             }
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthentication();
 
